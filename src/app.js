@@ -96,9 +96,9 @@ app.put("/repositories/:id/like", (request, response) => {
 
   const like = {
     id,
-    title,
-    url,
-    techs,
+    // title,
+    // url,
+    // techs,
     likes
   };
 
