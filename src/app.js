@@ -16,11 +16,8 @@ function logRequests(request, response, next) {
 
   console.log(logLabel);
 
-  console.time(logLabel);
-
   return next(); //proximo middleware
 
-  console.timeEnd(logLabel);
 }
 
 function validadeRepositorieID(request, response, next) {
@@ -31,7 +28,6 @@ function validadeRepositorieID(request, response, next) {
   }
   return next();
 }
-
 
 app.use(logRequests);
 app.use('/projects/:id', validadeRepositorieID); //opcao para rotas
@@ -53,23 +49,22 @@ app.post("/repositories", (request, response) => {
 
 app.put("/repositories/:id", (request, response) => {
   const { id } = request.params;
-  const { title, owner } = request.body;
+  const { title, url, techs } = request.body;
 
-  const projectIndex = projects.findIndex(project => project.id == id);
+  const repositorieIndex = repositories.findIndex(repositorie => repositorie.id == id);
 
-  if (projectIndex < 0) {
-    return response.status(400).json({ error: 'Project Not Found' })
+  if (repositorieIndex < 0) {
+    return response.status(400).json({ error: 'Repositorie Not Found' })
   };
 
   const repositorie = {
     id,
     title,
     url,
-    techs,
-    likes
+    techs
   };
 
-  projects[projectIndex] = repositorie;
+  repositories[repositorieIndex] = repositorie;
 
 
   return response.json(repositorie);
@@ -78,18 +73,38 @@ app.put("/repositories/:id", (request, response) => {
 app.delete("/repositories/:id", (request, response) => {
   const { id } = request.params;
 
-  const projectIndex = projects.findIndex(project => project.id == id);
+  const repositorieIndex = repositories.findIndex(repositorie => repositorie.id == id);
 
-  if (projectIndex < 0) {
-    return response.status(400).json({ error: 'Project Not Found' })
+  if (repositorieIndex < 0) {
+    return response.status(400).json({ error: 'Repositorie Not Found' })
   };
 
-  projects.splice(projectIndex, 1)
+  repositories.splice(repositorieIndex, 1)
   return response.status(204).send();
 });
 
-app.post("/repositories/:id/like", (request, response) => {
-  // TODO
+app.put("/repositories/:id/like", (request, response) => {
+  const { id } = request.params;
+  const { likes } = request.body;
+
+  const repositorieIndex = repositories.findIndex(repositorie => repositorie.id == id);
+
+  if (repositorieIndex < 0) {
+    return response.status(400).json({ error: 'Repositorie Not Found' })
+  };
+
+
+  const like = {
+    id,
+    title,
+    url,
+    techs,
+    likes
+  };
+
+  repositories[repositorieIndex] = like;
+
+  return response.json(like);
 });
 
 module.exports = app;
