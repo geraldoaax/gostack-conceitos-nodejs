@@ -9,6 +9,7 @@ app.use(cors());
 
 const repositories = [];
 
+
 function logRequests(request, response, next) {
   const { method, url } = request;
   const logLabel = `[${method.toUpperCase()}] ${url}`;
@@ -22,8 +23,20 @@ function logRequests(request, response, next) {
   console.timeEnd(logLabel);
 }
 
-app.get("/repositories", logRequests, (request, response) => {
-  const { repositories } = request.query;
+function validadeRepositorieID(request, response, next) {
+  const { id } = request.params;
+
+  if (!isUuid(id)) {
+    return response.status(400).json({ error: 'Invalid Repositorie ID!' });
+  }
+  return next();
+}
+
+
+app.use(logRequests);
+app.use('/projects/:id', validadeRepositorieID); //opcao para rotas
+
+app.get("/repositories", (request, response) => {
 
   return response.json(repositories);
 
@@ -48,20 +61,31 @@ app.put("/repositories/:id", (request, response) => {
     return response.status(400).json({ error: 'Project Not Found' })
   };
 
-  const project = {
+  const repositorie = {
     id,
     title,
-    owner,
+    url,
+    techs,
+    likes
   };
 
-  projects[projectIndex] = project;
+  projects[projectIndex] = repositorie;
 
 
-  return response.json(project);
+  return response.json(repositorie);
 });
 
 app.delete("/repositories/:id", (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const projectIndex = projects.findIndex(project => project.id == id);
+
+  if (projectIndex < 0) {
+    return response.status(400).json({ error: 'Project Not Found' })
+  };
+
+  projects.splice(projectIndex, 1)
+  return response.status(204).send();
 });
 
 app.post("/repositories/:id/like", (request, response) => {
