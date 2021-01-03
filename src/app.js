@@ -72,7 +72,7 @@ app.delete("/repositories/:id", (request, response) => {
 
 app.post("/repositories/:id/like", (request, response) => {
   const { id } = request.params;
-  const repository = repositories.find(repo => repo.id === id);
+  const repository = repositories.find(repository => repository.id === id);
 
   if (!repository) {
     return response.status(400).json({ error: 'Repository not Found!' });
